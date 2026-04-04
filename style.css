@@ -1,0 +1,126 @@
+body{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 0 auto;
+    height: 100vh;
+    background: linear-gradient(180deg, #dff6ec 0%, #f5fbf7 100%);
+    color: #023336;
+    font-family: Arial, Helvetica, sans-serif;
+ }
+ .container{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: #fff;
+    /* width: 50%; */
+    min-width: 40%;
+    padding: 24px 20px;
+    border-radius: 18px;
+    box-shadow:  0px 16px 40px rgba(2, 51, 54, 0.12);
+}
+
+ h1{
+    color: rgb(6, 112, 77);
+ font-size: 30px;
+ font-weight: 700px;
+ }
+input{
+   width: 250px;
+   height: 38px;
+   border-radius: 8px;
+   border: 2px solid #4da674;
+   padding-left: 10px;
+   font-size: 16px;
+   font-weight: bold;
+ }
+ .city-input{
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   flex-wrap: wrap;
+   justify-content: center;
+ }
+ label{
+    font-size: 18px;
+    font-weight: 700;
+    color: rgb(113, 71, 71);
+ }
+ .fa-fa-search{
+   position: absolute;
+   right: 500px;
+   top: 295px;
+   color: #4da674;
+   font-weight: 700;
+ }
+ .fa-sun-o {
+    position: absolute;
+    top: 365px;
+    color: #4da674;
+    font-size: 30px;
+    font-weight: 700;
+ }
+
+ button{
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    background-color: #4da674;
+    height: 38px;
+    width: 42px;
+    border-radius: 10px;
+ }
+.weatherResult,
+.weather-result {
+    margin-top: 24px;
+    width: 100%;
+}
+
+.weatherResult .weather-card,
+.weather-result .weather-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+.weatherResult .city,
+.weather-result .city{
+font-size: 20px;
+font-weight: bold;
+text-align: center;
+margin: 0;
+}
+
+.weatherResult .description,
+.weather-result .description {
+    margin: 0;
+    color: #4e6b6d;
+    font-size: 16px;
+}
+
+.weatherResult .time-of-day,
+.weather-result .time-of-day {
+    margin: 0;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background-color: #e6f4ec;
+    color: #2f6c52;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.weatherResult .temperature,
+.weather-result .temperature {
+    font-size: 24px;
+    margin: 0;
+    font-weight: 700;
+}
+
+.weatherResult .weather-icon,
+.weather-result .weather-icon{
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
