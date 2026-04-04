@@ -124,3 +124,93 @@ margin: 0;
     height: 72px;
     object-fit: contain;
 }
+
+@media (max-width: 900px) {
+    body {
+        padding: 24px;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: min(100%, 560px);
+        min-width: unset;
+        padding: 24px 18px;
+    }
+
+    .city-input {
+        width: 100%;
+    }
+
+    input {
+        flex: 1;
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 16px;
+        align-items: stretch;
+    }
+
+    .container {
+        width: 100%;
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: 18px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .city-input {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    label {
+        font-size: 16px;
+    }
+
+    input {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        height: 42px;
+    }
+
+    .weatherResult,
+    .weather-result {
+        margin-top: 20px;
+    }
+
+    .weatherResult .city,
+    .weather-result .city {
+        font-size: 18px;
+    }
+
+    .weatherResult .description,
+    .weather-result .description {
+        font-size: 15px;
+    }
+
+    .weatherResult .temperature,
+    .weather-result .temperature {
+        font-size: 22px;
+    }
+
+    .weatherResult .weather-icon,
+    .weather-result .weather-icon {
+        width: 64px;
+        height: 64px;
+    }
+}
