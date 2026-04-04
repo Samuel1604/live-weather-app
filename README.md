@@ -1,2 +1,2 @@
 # live-weather-app
-Live Weather App is a lightweight, frontend weather application developed with TypeScript, HTML, and CSS. It integrates the Open-Meteo API and geocoding services to provide real-time weather updates based on user input. The app demonstrates API integration, asynchronous data handling, and dynamic UI rendering without relying on frameworks.
+Live Weather App is a lightweight weather application built using vanilla TypeScript, HTML, and CSS without any frontend frameworks or build tools. The project uses the Open-Meteo API and its geocoding service to fetch real-time weather data based on user input. It demonstrates direct TypeScript compilation with tsc, API integration, and dynamic DOM manipulation.
