@@ -125,6 +125,18 @@ margin: 0;
     object-fit: contain;
 }
 
+.weatherResult .error-message,
+.weather-result .error-message {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background-color: #fdeaea;
+    color: #b42318;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
 @media (max-width: 900px) {
     body {
         padding: 24px;
@@ -206,6 +218,11 @@ margin: 0;
     .weatherResult .temperature,
     .weather-result .temperature {
         font-size: 22px;
+    }
+
+    .weatherResult .error-message,
+    .weather-result .error-message {
+        font-size: 14px;
     }
 
     .weatherResult .weather-icon,

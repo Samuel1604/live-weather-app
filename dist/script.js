@@ -58,61 +58,78 @@ const weatherCodes = {
 };
 const input = document.getElementById("city");
 const result = document.getElementById("weather-result");
+const renderError = (message) => {
+    const errorText = document.createElement("p");
+    errorText.className = "error-message";
+    errorText.textContent = message;
+    result.replaceChildren(errorText);
+};
 const getWeather = async () => {
     const cityInput = input.value;
     // console.log(cityInput);
-    const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityInput}`)
-        .then((response) => response.json())
-        .catch((err) => err.message);
-    if (!geoResponse.results || geoResponse.results.length === 0) {
-        throw new Error("City not found");
+    try {
+        const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityInput}`)
+            .then((response) => response.json())
+            .catch((err) => console.error(err));
+        if (!geoResponse.results || geoResponse.results.length === 0) {
+            throw new Error("City not found");
+        }
+        console.log(geoResponse.results);
+        const { latitude, longitude, name } = geoResponse.results[0];
+        // console.log(`Location: ${name}, ${country}`);
+        const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&current_units=temperature_2m&timezone=auto`)
+            .then((response) => response.json())
+            .catch((err) => err.message);
+        if (!weather.current) {
+            throw new Error(`${cityInput} Weather not found`);
+        }
+        console.log(weather);
+        const { temperature_2m, weather_code, is_day } = weather.current;
+        console.log(is_day);
+        const temp_unit = weather.current_units.temperature_2m;
+        const is_day_text = is_day == 1 ? "Day" : "Night";
+        const city = document.createElement("p");
+        city.className = "city";
+        city.textContent = name;
+        const temp = document.createElement("p");
+        temp.className = "temperature";
+        const description = document.createElement("p");
+        description.className = "description";
+        const timeOfDay = document.createElement("p");
+        timeOfDay.className = "time-of-day";
+        const weatherCard = document.createElement("div");
+        weatherCard.className = "weather-card";
+        const weatherIcon = document.createElement("img");
+        const getIcon = (weather_code) => {
+            let icon = weather_code == 0
+                ? weatherIcons.clear
+                : [1, 2, 3, 45, 48].includes(weather_code)
+                    ? weatherIcons.cloudy
+                    : [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weather_code)
+                        ? weatherIcons.rain
+                        : [71, 73, 75].includes(weather_code)
+                            ? weatherIcons.snow
+                            : weatherIcons.default;
+            return icon;
+        };
+        weatherIcon.src = getIcon(weather_code) ?? "";
+        weatherIcon.alt = weatherCodes[weather_code] ?? "Weather icon";
+        weatherIcon.className = "weather-icon";
+        description.textContent = weatherCodes[weather_code] ?? "Weather update";
+        timeOfDay.textContent = is_day_text;
+        temp.textContent = `${temperature_2m} ${temp_unit}`;
+        // const resultText = `The current weather of ${city} is ${weatherCodes[weather_code]} with a temperature of ${temp}, ${is_day_text} ${weatherIcon}`;
+        weatherCard.append(city, weatherIcon, description, timeOfDay, temp);
+        result.replaceChildren(weatherCard);
     }
-    const { latitude, longitude, name } = geoResponse.results[0];
-    // console.log(`Location: ${name}, ${country}`);
-    const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&current_units=temperature_2m&timezone=auto`)
-        .then((response) => response.json())
-        .catch((err) => err.message);
-    if (!weather.current) {
-        throw new Error(`${cityInput} Weather not found`);
+    catch (error) {
+        if (error instanceof Error) {
+            renderError(error.message);
+            // console.error("Error message: ", error.message);
+            return;
+        }
+        renderError("Something went wrong. Please try again.");
     }
-    console.log(weather);
-    const { temperature_2m, weather_code, is_day } = weather.current;
-    console.log(is_day);
-    const temp_unit = weather.current_units.temperature_2m;
-    const is_day_text = is_day == 1 ? "Day" : "Night";
-    const city = document.createElement("p");
-    city.className = "city";
-    city.textContent = name;
-    const temp = document.createElement("p");
-    temp.className = "temperature";
-    const description = document.createElement("p");
-    description.className = "description";
-    const timeOfDay = document.createElement("p");
-    timeOfDay.className = "time-of-day";
-    const weatherCard = document.createElement("div");
-    weatherCard.className = "weather-card";
-    const weatherIcon = document.createElement("img");
-    const getIcon = (weather_code) => {
-        let icon = weather_code == 0
-            ? weatherIcons.clear
-            : [1, 2, 3, 45, 48].includes(weather_code)
-                ? weatherIcons.cloudy
-                : [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weather_code)
-                    ? weatherIcons.rain
-                    : [71, 73, 75].includes(weather_code)
-                        ? weatherIcons.snow
-                        : weatherIcons.default;
-        return icon;
-    };
-    weatherIcon.src = getIcon(weather_code) ?? "";
-    weatherIcon.alt = weatherCodes[weather_code] ?? "Weather icon";
-    weatherIcon.className = "weather-icon";
-    description.textContent = weatherCodes[weather_code] ?? "Weather update";
-    timeOfDay.textContent = is_day_text;
-    temp.textContent = `${temperature_2m} ${temp_unit}`;
-    // const resultText = `The current weather of ${city} is ${weatherCodes[weather_code]} with a temperature of ${temp}, ${is_day_text} ${weatherIcon}`;
-    weatherCard.append(city, weatherIcon, description, timeOfDay, temp);
-    result.replaceChildren(weatherCard);
 };
 const search = document.getElementById("search");
 search.addEventListener("click", () => {
