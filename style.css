@@ -65,7 +65,7 @@ input{
    box-sizing: border-box;
  }
  input::placeholder{
-   color: rgb(53, 49, 49);
+   color: rgb(124, 122, 122);
     font-weight: 500;
  }
 
