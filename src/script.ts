@@ -64,52 +64,93 @@ const weatherCodes: Record<number, string> = {
 };
 const input = document.getElementById("city") as HTMLInputElement;
 const result = document.getElementById("weather-result") as HTMLDivElement;
+const searchState = document.getElementById("search-state") as HTMLDivElement;
+const loadingState = document.getElementById("loading-state") as HTMLDivElement;
+const errorState = document.getElementById("error-state") as HTMLDivElement;
+const retryState = document.getElementById("retry-state") as HTMLButtonElement;
+const search = document.getElementById("search") as HTMLButtonElement;
+
+const states = [searchState, loadingState, result, errorState];
+
+const showState = (state: HTMLElement) => {
+  states.forEach((item) => item.classList.remove("active"));
+  state.classList.add("active");
+};
+
+const clearResult = () => {
+  result.replaceChildren();
+};
+
+const clearError = () => {
+  errorState.replaceChildren(retryState);
+};
+
 const renderError = (message: string) => {
   const errorText = document.createElement("p") as HTMLParagraphElement;
   errorText.className = "error-message";
   errorText.textContent = message;
-  result.replaceChildren(errorText);
+  errorText.style.color = "#FF3333";
+  errorText.style.fontWeight = "bolder";
+  errorText.style.fontSize = "16px";
+  clearError();
+  errorState.prepend(errorText);
+  showState(errorState);
 };
 
 const getWeather = async () => {
-  const cityInput: String = input.value;
-  // console.log(cityInput);
+  const cityInput: string = input.value.trim();
+  if (!cityInput) {
+    renderError("Please enter a city name.");
+    return;
+  }
+
+  clearError();
+  clearResult();
+  showState(loadingState);
   try {
     const geoResponse = await fetch(
       `https://geocoding-api.open-meteo.com/v1/search?name=${cityInput}`,
-    )
-      .then((response) => response.json())
-      .catch((err) => console.error(err));
-    if (!geoResponse.results || geoResponse.results.length === 0) {
+    );
+    if (!geoResponse.ok) {
+      throw new Error("Failed to fetch location data");
+    }
+    const geoData = await geoResponse.json();
+    if (!geoData.results || geoData.results.length === 0) {
       throw new Error("City not found");
     }
-    console.log(geoResponse.results);
+    // console.log(geoData.results[0]);
 
     interface Response {
       latitude: number;
       longitude: number;
       name: string;
     }
-    const { latitude, longitude, name }: Response = geoResponse.results[0];
-    // console.log(`Location: ${name}, ${country}`);
+    const { latitude, longitude, name }: Response = geoData.results[0];
+    // console.log(latitude, longitude, name);
     const weather = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&current_units=temperature_2m&timezone=auto`,
-    )
-      .then((response) => response.json())
-      .catch((err) => err.message);
-    if (!weather.current) {
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&current_weather_units=temperature_2m&timezone=auto`,
+    );
+    if (!weather.ok) {
+      throw new Error(`Failed to fetch ${cityInput} weather`);
+    }
+    // console.log(weather)
+
+    const weatherData = await weather.json();
+    // console.log(weatherData)
+    if (!weatherData.current_weather) {
       throw new Error(`${cityInput} Weather not found`);
     }
+    // console.log(weatherData.current_weather)
     interface CurrentWeather {
-      temperature_2m: number;
-      weather_code: number;
+      temperature: number;
+      weathercode: number;
       is_day: number;
     }
-    console.log(weather);
-    const { temperature_2m, weather_code, is_day }: CurrentWeather =
-      weather.current;
-    console.log(is_day);
-    const temp_unit = weather.current_units.temperature_2m;
+    // console.log(weather);
+    const { temperature, weathercode, is_day }: CurrentWeather =
+      weatherData.current_weather;
+    // console.log(is_day);
+    const temp_unit = weatherData.current_weather_units.temperature;
     const is_day_text = is_day == 1 ? "Day" : "Night";
     const city = document.createElement("p") as HTMLParagraphElement;
     city.className = "city";
@@ -138,29 +179,45 @@ const getWeather = async () => {
                 : weatherIcons.default;
       return icon;
     };
-    weatherIcon.src = getIcon(weather_code) ?? "";
-    weatherIcon.alt = weatherCodes[weather_code] ?? "Weather icon";
+    weatherIcon.src = getIcon(weathercode) ?? "";
+    weatherIcon.alt = weatherCodes[weathercode] ?? "Weather icon";
     weatherIcon.className = "weather-icon";
-    description.textContent = weatherCodes[weather_code] ?? "Weather update";
+    description.textContent = weatherCodes[weathercode] ?? "Weather update";
+
     timeOfDay.textContent = is_day_text;
-    temp.textContent = `${temperature_2m} ${temp_unit}`;
+    temp.textContent = `${temperature} ${temp_unit}`;
     // const resultText = `The current weather of ${city} is ${weatherCodes[weather_code]} with a temperature of ${temp}, ${is_day_text} ${weatherIcon}`;
-    weatherCard.append(city, weatherIcon, description, timeOfDay, temp);
-    result.replaceChildren(weatherCard);
+    weatherCard.append(weatherIcon, description, timeOfDay, temp);
+    const checkAgain = document.createElement("button") as HTMLButtonElement;
+    checkAgain.className = "check-again";
+    checkAgain.textContent = "Check another city";
+    checkAgain.addEventListener("click", goBack);
+    const subtitle = document.querySelector(".subtitle") as HTMLHeadingElement;
+    clearResult();
+    result.append(weatherCard, checkAgain);
+    subtitle.innerHTML = `Current weather of ${city.textContent}`;
+    subtitle.style.color = "#fff";
+    showState(result);
   } catch (error: unknown) {
     if (error instanceof Error) {
       renderError(error.message);
-      // console.error("Error message: ", error.message);
       return;
     }
     renderError("Something went wrong. Please try again.");
   }
-  
-  
 };
 
-const search = document.getElementById("search") as HTMLButtonElement;
 search.addEventListener("click", () => {
   getWeather();
-  
 });
+
+const goBack = () => {
+  clearError();
+  clearResult();
+  input.value = "";
+  showState(searchState);
+  input.focus();
+};
+
+retryState.addEventListener("click", goBack);
+showState(searchState);

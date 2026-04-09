@@ -1,22 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Live Weather App</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <h2>Welcome to Weather App</h2>
     <div class="container">
-        <h2>Welcome to Weather App</h2>
-        <div class="city-input">
-            <label for="city">City</label>
-            <input type="text" class="text-input" id="city" placeholder="Enter city here" required>
-            <button id="search"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
-        </div>
-        <div class="weatherResult" id="weather-result"></div>
+      
+      <h3 class="subtitle">What&apos;s the weather like in?</h3>
+      <div class="city-input state active" id="search-state">
+        <!-- <label for="city">Which City are you? What&apos;s the weather like in?</label> -->
+        <input
+          type="text"
+          class="text-input"
+          id="city"
+          placeholder="Which city are you?"
+          required
+        />
+        <button id="search">
+          <i class="fa-solid fa-search" aria-hidden="true"></i>
+        </button>
+      </div>
+      <!-- Loading State -->
+      <div id="loading-state" class="state">
+        <div class="spinner"></div>
+        <p>Checking the sky...</p>
+      </div>
+      <!-- Result State -->
+      <div class="weatherResult state" id="weather-result"></div>
+      <!-- Error State -->
+      <div id="error-state" class="state">
+        <!-- <p>We couldn’t find that city</p> -->
+        <button id="retry-state">Try again</button>
+      </div>
     </div>
     <script type="module" src="dist/script.js" defer></script>
-</body>
+  </body>
 </html>

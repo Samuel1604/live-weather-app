@@ -58,35 +58,67 @@ const weatherCodes = {
 };
 const input = document.getElementById("city");
 const result = document.getElementById("weather-result");
+const searchState = document.getElementById("search-state");
+const loadingState = document.getElementById("loading-state");
+const errorState = document.getElementById("error-state");
+const retryState = document.getElementById("retry-state");
+const search = document.getElementById("search");
+const states = [searchState, loadingState, result, errorState];
+const showState = (state) => {
+    states.forEach((item) => item.classList.remove("active"));
+    state.classList.add("active");
+};
+const clearResult = () => {
+    result.replaceChildren();
+};
+const clearError = () => {
+    errorState.replaceChildren(retryState);
+};
 const renderError = (message) => {
     const errorText = document.createElement("p");
     errorText.className = "error-message";
     errorText.textContent = message;
-    result.replaceChildren(errorText);
+    errorText.style.color = "#FF3333";
+    errorText.style.fontWeight = "bolder";
+    errorText.style.fontSize = "16px";
+    clearError();
+    errorState.prepend(errorText);
+    showState(errorState);
 };
 const getWeather = async () => {
-    const cityInput = input.value;
-    // console.log(cityInput);
+    const cityInput = input.value.trim();
+    if (!cityInput) {
+        renderError("Please enter a city name.");
+        return;
+    }
+    clearError();
+    clearResult();
+    showState(loadingState);
     try {
-        const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityInput}`)
-            .then((response) => response.json())
-            .catch((err) => console.error(err));
-        if (!geoResponse.results || geoResponse.results.length === 0) {
+        const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityInput}`);
+        if (!geoResponse.ok) {
+            throw new Error("Failed to fetch location data");
+        }
+        const geoData = await geoResponse.json();
+        if (!geoData.results || geoData.results.length === 0) {
             throw new Error("City not found");
         }
-        console.log(geoResponse.results);
-        const { latitude, longitude, name } = geoResponse.results[0];
-        // console.log(`Location: ${name}, ${country}`);
-        const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&current_units=temperature_2m&timezone=auto`)
-            .then((response) => response.json())
-            .catch((err) => err.message);
-        if (!weather.current) {
+        const { latitude, longitude, name } = geoData.results[0];
+        // console.log(latitude, longitude, name);
+        const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&current_weather_units=temperature_2m&timezone=auto`);
+        if (!weather.ok) {
+            throw new Error(`Failed to fetch ${cityInput} weather`);
+        }
+        // console.log(weather)
+        const weatherData = await weather.json();
+        // console.log(weatherData)
+        if (!weatherData.current_weather) {
             throw new Error(`${cityInput} Weather not found`);
         }
-        console.log(weather);
-        const { temperature_2m, weather_code, is_day } = weather.current;
-        console.log(is_day);
-        const temp_unit = weather.current_units.temperature_2m;
+        // console.log(weather);
+        const { temperature, weathercode, is_day } = weatherData.current_weather;
+        // console.log(is_day);
+        const temp_unit = weatherData.current_weather_units.temperature;
         const is_day_text = is_day == 1 ? "Day" : "Night";
         const city = document.createElement("p");
         city.className = "city";
@@ -112,28 +144,44 @@ const getWeather = async () => {
                             : weatherIcons.default;
             return icon;
         };
-        weatherIcon.src = getIcon(weather_code) ?? "";
-        weatherIcon.alt = weatherCodes[weather_code] ?? "Weather icon";
+        weatherIcon.src = getIcon(weathercode) ?? "";
+        weatherIcon.alt = weatherCodes[weathercode] ?? "Weather icon";
         weatherIcon.className = "weather-icon";
-        description.textContent = weatherCodes[weather_code] ?? "Weather update";
+        description.textContent = weatherCodes[weathercode] ?? "Weather update";
         timeOfDay.textContent = is_day_text;
-        temp.textContent = `${temperature_2m} ${temp_unit}`;
+        temp.textContent = `${temperature} ${temp_unit}`;
         // const resultText = `The current weather of ${city} is ${weatherCodes[weather_code]} with a temperature of ${temp}, ${is_day_text} ${weatherIcon}`;
-        weatherCard.append(city, weatherIcon, description, timeOfDay, temp);
-        result.replaceChildren(weatherCard);
+        weatherCard.append(weatherIcon, description, timeOfDay, temp);
+        const checkAgain = document.createElement("button");
+        checkAgain.className = "check-again";
+        checkAgain.textContent = "Check another city";
+        checkAgain.addEventListener("click", goBack);
+        const subtitle = document.querySelector(".subtitle");
+        clearResult();
+        result.append(weatherCard, checkAgain);
+        subtitle.innerHTML = `Current weather of ${city.textContent}`;
+        subtitle.style.color = "#fff";
+        showState(result);
     }
     catch (error) {
         if (error instanceof Error) {
             renderError(error.message);
-            // console.error("Error message: ", error.message);
             return;
         }
         renderError("Something went wrong. Please try again.");
     }
 };
-const search = document.getElementById("search");
 search.addEventListener("click", () => {
     getWeather();
 });
+const goBack = () => {
+    clearError();
+    clearResult();
+    input.value = "";
+    showState(searchState);
+    input.focus();
+};
+retryState.addEventListener("click", goBack);
+showState(searchState);
 export {};
 //# sourceMappingURL=script.js.map
