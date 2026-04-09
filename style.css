@@ -1,17 +1,23 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body{
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
     padding: 24px;
     background:
       linear-gradient(rgba(8, 18, 30, 0.72), rgba(8, 18, 30, 0.72)),
       url("https://images.unsplash.com/photo-1534088568595-a066f7104211?auto=format&fit=crop&q=80&w=2000") center/cover no-repeat;
     color: #f4f9ff;
     font-family: Arial, Helvetica, sans-serif;
-    overflow-y: hidden;
+    overflow-y: auto;
     flex-direction: column;
     gap: 16px;
  }
@@ -21,11 +27,12 @@ body{
     flex-direction: column;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.12);
-    min-width: 40%;
+    width: min(100%, 560px);
     padding: 32px 24px;
     border-radius: 18px;
     box-shadow:  0px 16px 40px rgba(2, 12, 24, 0.22);
     backdrop-filter: blur(8px);
+    box-sizing: border-box;
 }
 
 h2{
@@ -41,12 +48,12 @@ h2{
    font-size: 18px;
  }
 input{
-   width: 250px;
-   height: 38px;
+   width: min(100%, 260px);
+   min-height: 44px;
    border-radius: 8px;
    /* border: 2px solid rgba(167, 218, 255, 0.55); */
    border: 1px silver solid;
-   padding-left: 10px;
+   padding: 0 12px;
    font-size: 16px;
    margin-bottom: 12px;
    font-weight: bold;
@@ -55,6 +62,7 @@ input{
    color: black;
    cursor:text;
    outline: none;
+   box-sizing: border-box;
  }
  input::placeholder{
    color: black;
@@ -112,6 +120,7 @@ button{
       box-shadow 0.2s ease,
       background 0.2s ease,
       border-color 0.2s ease;
+    box-sizing: border-box;
  }
 
  button:hover{
@@ -187,6 +196,7 @@ button{
 .weather-result {
     margin-top: 24px;
     width: 100%;
+    max-width: 100%;
 }
 .weather-card {
     margin-bottom: 12px;
@@ -259,7 +269,7 @@ margin: 0;
 @media (max-width: 900px) {
     body {
         padding: 24px;
-        height: 100vh;
+        min-height: 100vh;
     }
 
     .container {
@@ -284,44 +294,53 @@ margin: 0;
     }
 }
 
-/* @media (max-width: 600px) {
+@media (max-width: 600px) {
     body {
-        padding: 16px;
+        justify-content: flex-start;
         align-items: stretch;
+        padding: 18px 14px 24px;
+        gap: 12px;
     }
 
     .container {
         width: 100%;
-        padding: 20px 16px;
+        padding: 22px 16px;
         border-radius: 14px;
     }
 
     h2 {
-        margin-top: 0;
-        margin-bottom: 18px;
+        margin-top: 6px;
+        margin-bottom: 0;
         text-align: center;
-        font-size: 24px;
+        font-size: 28px;
     }
 
-    .city-input {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    label {
+    .subtitle {
+        margin: 8px 0 18px;
         font-size: 16px;
+    }
+
+    .city-input,
+    .state.active,
+    .weatherResult,
+    .weather-result,
+    #error-state {
+        width: 100%;
+        max-width: 100%;
     }
 
     input {
         width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
+        max-width: none;
+        margin-bottom: 8px;
     }
 
-    button {
+    button,
+    #search,
+    #retry-state,
+    .check-again {
         width: 100%;
-        height: 42px;
+        max-width: none;
     }
 
     .weatherResult,
@@ -354,4 +373,4 @@ margin: 0;
         width: 64px;
         height: 64px;
     }
-} */
+}
