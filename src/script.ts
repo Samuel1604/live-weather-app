@@ -69,6 +69,7 @@ const loadingState = document.getElementById("loading-state") as HTMLDivElement;
 const errorState = document.getElementById("error-state") as HTMLDivElement;
 const retryState = document.getElementById("retry-state") as HTMLButtonElement;
 const search = document.getElementById("search") as HTMLButtonElement;
+const subtitle = document.querySelector(".subtitle") as HTMLHeadingElement;
 
 const states = [searchState, loadingState, result, errorState];
 
@@ -192,10 +193,13 @@ const getWeather = async () => {
     checkAgain.className = "check-again";
     checkAgain.textContent = "Check another city";
     checkAgain.addEventListener("click", goBack);
-    const subtitle = document.querySelector(".subtitle") as HTMLHeadingElement;
+
     clearResult();
     result.append(weatherCard, checkAgain);
-    subtitle.innerHTML = `Current weather of ${city.textContent}`;
+    subtitle.replaceChild(
+      document.createTextNode(`Current weather of ${city.textContent}`),
+      subtitle.firstChild as ChildNode,
+    );
     subtitle.style.color = "#fff";
     showState(result);
   } catch (error: unknown) {
@@ -214,6 +218,10 @@ search.addEventListener("click", () => {
 const goBack = () => {
   clearError();
   clearResult();
+  subtitle.replaceChild(
+    document.createTextNode("Which city are you?"),
+    subtitle.firstChild as ChildNode,
+  );
   input.value = "";
   showState(searchState);
   input.focus();

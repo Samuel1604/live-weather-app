@@ -63,6 +63,7 @@ const loadingState = document.getElementById("loading-state");
 const errorState = document.getElementById("error-state");
 const retryState = document.getElementById("retry-state");
 const search = document.getElementById("search");
+const subtitle = document.querySelector(".subtitle");
 const states = [searchState, loadingState, result, errorState];
 const showState = (state) => {
     states.forEach((item) => item.classList.remove("active"));
@@ -156,10 +157,9 @@ const getWeather = async () => {
         checkAgain.className = "check-again";
         checkAgain.textContent = "Check another city";
         checkAgain.addEventListener("click", goBack);
-        const subtitle = document.querySelector(".subtitle");
         clearResult();
         result.append(weatherCard, checkAgain);
-        subtitle.innerHTML = `Current weather of ${city.textContent}`;
+        subtitle.replaceChild(document.createTextNode(`Current weather of ${city.textContent}`), subtitle.firstChild);
         subtitle.style.color = "#fff";
         showState(result);
     }
@@ -177,6 +177,7 @@ search.addEventListener("click", () => {
 const goBack = () => {
     clearError();
     clearResult();
+    subtitle.replaceChild(document.createTextNode("Which city are you?"), subtitle.firstChild);
     input.value = "";
     showState(searchState);
     input.focus();
